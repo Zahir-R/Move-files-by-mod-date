@@ -70,7 +70,7 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
             fs::path destination_file = date_folder / file.path().filename();
             fs::rename(file.path(), destination_file);
 
-            std::wcout << L"Archivo movido: " << file.path() << L" -> " << destination_file << std::endl;
+            std::wcout << L"File moved: " << file.path() << L" -> " << destination_file << std::endl;
         }
 
     } catch (const fs::filesystem_error& e) {
