@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <vector>
 #include <algorithm>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -22,6 +23,7 @@ std::wstring select_folder() {
             CoTaskMemFree(pidl);
             return path;
         }
+        CoTaskMemFree(pidl);
     }
     return L"";
 }
@@ -67,7 +69,19 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
             }
 
             // Move the file to the subfolder
-            fs::path destination_file = date_folder / file.path().filename();
+            fs::path filename = file.path().filename();
+            fs::path destination_file = date_folder / filename;
+            
+            // If file exists, add a numeric suffix before extension
+            int counter = 1;
+            while (fs::exists(destination_file)) {
+                std::wstring stem = filename.stem().wstring();
+                std::wstring extension = filename.extension().wstring();
+                destination_file = date_folder / fs::path(stem + L"_" + std::to_wstring(counter) + extension);
+                ++counter;
+            }
+            
+            // Move the file
             fs::rename(file.path(), destination_file);
 
             std::wcout << L"File moved: " << file.path() << L" -> " << destination_file << std::endl;
@@ -79,6 +93,8 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
 }
 
 int main() {
+    CoInitialize(NULL);
+    
     std::wcout << L"Select the source folder:" << std::endl;
     std::wstring source_folder = select_folder();
     if (source_folder.empty()) {
@@ -95,5 +111,6 @@ int main() {
 
     move_files_by_date(source_folder, destination_folder);
 
-return 0;
+    CoUninitialize();
+    return 0;
 }
