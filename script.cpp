@@ -1,6 +1,6 @@
 #define UNICODE
 #include <windows.h>
-#include <shlobj.h> // Para la función SHBrowseForFolder
+#include <shlobj.h>
 #include <iostream>
 #include <filesystem>
 #include <vector>
@@ -8,65 +8,65 @@
 
 namespace fs = std::filesystem;
 
-// Función para abrir el cuadro de diálogo y seleccionar una carpeta
+// Open chart and select a folder
 std::wstring select_folder() {
     BROWSEINFO bi = {0};
-    bi.lpszTitle = L"Selecciona una carpeta"; // Título del cuadro de diálogo
+    bi.lpszTitle = L"Select a folder";
 
-    // Abrir el cuadro de diálogo
+    // Open dialog box
     LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
     if (pidl != 0) {
-        // Obtener la ruta seleccionada
+        // Get path
         wchar_t path[MAX_PATH];
         if (SHGetPathFromIDList(pidl, path)) {
             CoTaskMemFree(pidl);
-            return path; // Retorna la ruta de la carpeta seleccionada
+            return path;
         }
     }
-    return L""; // Si no se seleccionó nada
+    return L"";
 }
 
-// Función para mover los archivos según su fecha
+// Move files based on the dates
 void move_files_by_date(const fs::path& source_folder, const fs::path& destination_folder) {
     try {
-        // Verificar si la carpeta de destino existe, si no, crearla
+        // Create a folder if it does not exist
         if (!fs::exists(destination_folder)) {
             fs::create_directories(destination_folder);
         }
 
         std::vector<fs::directory_entry> files;
 
-        // Leer todos los archivos en la carpeta origen
+        // Read all files in the source folder
         for (const auto& entry : fs::directory_iterator(source_folder)) {
             if (fs::is_regular_file(entry.status())) {
                 files.push_back(entry);
             }
         }
 
-        // Ordenar los archivos por fecha de modificación
+        // Sort files by modification date
         std::sort(files.begin(), files.end(), [](const fs::directory_entry& a, const fs::directory_entry& b) {
             return fs::last_write_time(a) < fs::last_write_time(b);
         });
 
-        // Mover los archivos a la carpeta destino, creando subcarpetas por fecha
+        // Move the files to the destination folder, creating subfolders by date
         for (const auto& file : files) {
             auto last_write_time = fs::last_write_time(file);
             auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
                 last_write_time - fs::file_time_type::clock::now() +std::chrono::system_clock::now());
             std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
 
-            // Convertir la fecha en formato "dd_mm_yyyy"
+            // Convert date format to "dd_mm_yyyy"
             std::tm tm = *std::localtime(&cftime);
             char date_str[100];
             strftime(date_str, sizeof(date_str), "%d-%m-%Y", &tm);
 
-            // Crear una subcarpeta con la fecha de la última modificación
+            // Create a subfolder with the last modification date
             fs::path date_folder = destination_folder / date_str;
             if (!fs::exists(date_folder)) {
                 fs::create_directory(date_folder);
             }
 
-            // Mover el archivo a la subcarpeta correspondiente
+            // Move the file to the subfolder
             fs::path destination_file = date_folder / file.path().filename();
             fs::rename(file.path(), destination_file);
 
@@ -79,23 +79,20 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
 }
 
 int main() {
-    // Abrir el cuadro de selección de carpeta para la carpeta origen
-    std::wcout << L"Selecciona la carpeta origen:" << std::endl;
+    std::wcout << L"Select the source folder:" << std::endl;
     std::wstring source_folder = select_folder();
     if (source_folder.empty()) {
-        std::wcout << L"No se seleccionó una carpeta origen. Saliendo..." << std::endl;
+        std::wcout << L"No source folder selected." << std::endl;
         return 1;
     }
 
-    // Abrir el cuadro de selección de carpeta para la carpeta destino
-    std::wcout << L"Selecciona la carpeta destino:" << std::endl;
+    std::wcout << L"Select the destination folder:" << std::endl;
     std::wstring destination_folder = select_folder();
     if (destination_folder.empty()) {
-        std::wcout << L"No se seleccionó una carpeta destino. Saliendo..." << std::endl;
+        std::wcout << L"No destination folder selected." << std::endl;
         return 1;
     }
 
-    // Llamar a la función para mover los archivos
     move_files_by_date(source_folder, destination_folder);
 
 return 0;
