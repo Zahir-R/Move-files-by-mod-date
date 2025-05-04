@@ -21,16 +21,15 @@ std::wstring select_folder() {
         wchar_t path[MAX_PATH];
         if (SHGetPathFromIDList(pidl, path)) {
             std::wstring result(path);
-            
+
+            // Free memory using using IMalloc
             IMalloc* imalloc = nullptr;
             if (SUCCEEDED(SHGetMalloc(&imalloc))) {
                 imalloc->Free(pidl);
                 imalloc->Release();
             }
-            
             return result;
         }
-        
         IMalloc* imalloc = nullptr;
         if (SUCCEEDED(SHGetMalloc(&imalloc))) {
             imalloc->Free(pidl);
