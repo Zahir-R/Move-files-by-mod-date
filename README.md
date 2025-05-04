@@ -48,9 +48,8 @@ g++ -o move_files move_files.cpp
 5. After compilation, you can run the resulting executable (move_files.exe) from your terminal or command prompt.
 
 ## Error Handling
-Permissions Issues: Make sure the program has permission to read from the origin folder and write to the destination folder. If not, run the program as an administrator.
-
-File Name Conflicts: If a file with the same name already exists in the destination folder, the program will add a numeric suffix (e.g., IMG_20250303_1.jpg) to prevent overwriting.
+- Permissions Issues: Make sure the program has permission to read from the origin folder and write to the destination folder. If not, run the program as an administrator.
+- File Name Conflicts: If a file with the same name already exists in the destination folder, the program will add a numeric suffix (e.g., IMG_20250303_1.jpg) to prevent overwriting.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
