@@ -20,22 +20,29 @@ std::wstring get_file_category(const std::wstring& extension) {
     std::wstring ext = extension;
     std::transform(ext.begin(), ext.end(), ext.begin(), ::towlower); // convertir a minúscula
 
+    // Verifica que la extensión sea parte de la categoría
     if (image_exts.count(ext)) return L"Fotos";
     if (video_exts.count(ext)) return L"Videos";
     if (document_exts.count(ext)) return L"Documentos";
     return L"Otros";
 }
 
+// Abre el cuadro y selecciona una carpeta
 std::wstring select_folder() {
     BROWSEINFO bi = {0};
     bi.lpszTitle = L"Selecciona una carpeta";
 
+    // Abre la caja de diálogo
     LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
     if (pidl != nullptr) {
+        // Toma una dirección
         wchar_t path[MAX_PATH];
         if (SHGetPathFromIDList(pidl, path)) {
             std::wstring result(path);
+
+            // Libera memoria usando IMalloc
             IMalloc* imalloc = nullptr;
+            
             if (SUCCEEDED(SHGetMalloc(&imalloc))) {
                 imalloc->Free(pidl);
                 imalloc->Release();
@@ -51,6 +58,7 @@ std::wstring select_folder() {
     return L"";
 }
 
+// Función para mostrar mensaje de confirmación
 bool confirm_move(const std::vector<fs::directory_entry>& files) {
     std::wstring message = L"Los siguientes archivos serán movidos:\n";
     for (const auto& file : files) {
@@ -58,10 +66,14 @@ bool confirm_move(const std::vector<fs::directory_entry>& files) {
     }
     message += L"\n¿Desea continuar?";
 
+    // Caja de mensajes con opciones de SÍ o NO
     int result = MessageBox(NULL, message.c_str(), L"Confirmación", MB_YESNO | MB_ICONQUESTION);
+    
+    // Si SÍ es seleccionado, devuelve el IDYES
     return (result == IDYES);
 }
 
+// Mover archivos por fechas
 void move_files_by_date(const fs::path& source_folder, const fs::path& destination_folder) {
     try {
         if (!fs::exists(destination_folder)) {
@@ -69,23 +81,29 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
         }
 
         std::vector<fs::directory_entry> files;
+
+        // Lee todos los archivos de la carpeta origen
         for (const auto& entry : fs::directory_iterator(source_folder)) {
             if (fs::is_regular_file(entry.status())) {
                 files.push_back(entry);
             }
         }
 
+        // Si existen archivos, llama al usuario para confirmar
         if (!files.empty() && confirm_move(files)) {
+            // Ordena los archivos por fecha de modificación
             std::sort(files.begin(), files.end(), [](const fs::directory_entry& a, const fs::directory_entry& b) {
                 return fs::last_write_time(a) < fs::last_write_time(b);
             });
 
+            // Mueve los archivos a la carpeta destino, creando subcarpetas
             for (const auto& file : files) {
                 auto last_write_time = fs::last_write_time(file);
                 auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
                     last_write_time - fs::file_time_type::clock::now() + std::chrono::system_clock::now());
                 std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
 
+                // Convierte el formato de fecha a "dd-mm-yyyy"
                 std::tm tm = *std::localtime(&cftime);
                 char date_str[100];
                 strftime(date_str, sizeof(date_str), "%d-%m-%Y", &tm);
@@ -99,10 +117,12 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
                     fs::create_directories(date_folder);
                 }
 
+                // Mover el archivo a la subcarpeta
                 fs::path filename = file.path().filename();
                 fs::path destination_file = date_folder / filename;
 
                 // Manejo de colisión de nombres
+                // Si el archivo ya existe, agrega un sufijo antes de la extensión
                 int counter = 1;
                 while (fs::exists(destination_file)) {
                     std::wstring stem = filename.stem().wstring();
@@ -111,6 +131,7 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
                     ++counter;
                 }
 
+                // Mover el archivo
                 fs::rename(file.path(), destination_file);
                 std::wcout << L"Archivo movido: " << file.path() << L" -> " << destination_file << std::endl;
             }
