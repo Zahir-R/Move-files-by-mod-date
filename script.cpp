@@ -11,14 +11,14 @@
 namespace fs = std::filesystem;
 
 // Categorías de extensiones
-const std::set<std::wstring> image_exts = {L".jpg", L".jpeg", L".png", L".bmp", L".gif", L".tiff"};
+const std::set<std::wstring> image_exts = {L".jpg", L".jpeg", L".png", L".bmp", L".gif", L".tiff", L".webp"};
 const std::set<std::wstring> video_exts = {L".mp4", L".avi", L".mov", L".mkv", L".wmv"};
 const std::set<std::wstring> document_exts = {L".pdf", L".doc", L".docx", L".xls", L".xlsx", L".ppt", L".pptx", L".txt"};
 
 // Determinar tipo de archivo
 std::wstring get_file_category(const std::wstring& extension) {
     std::wstring ext = extension;
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::towlower); // convertir a minúscula
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::towlower);
 
     // Verifica que la extensión sea parte de la categoría
     if (image_exts.count(ext)) return L"Fotos";
