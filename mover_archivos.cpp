@@ -1,4 +1,3 @@
-#define UNICODE
 #include <windows.h>
 #include <shlobj.h>
 #include <iostream>
@@ -11,14 +10,14 @@
 namespace fs = std::filesystem;
 
 // Categorías de extensiones
-const std::set<std::wstring> image_exts = {L".jpg", L".jpeg", L".png", L".bmp", L".gif", L".tiff", L".webp"};
+const std::set<std::wstring> image_exts = {L".jpg", L".jpeg", L".png", L".bmp", L".gif", L".tiff"};
 const std::set<std::wstring> video_exts = {L".mp4", L".avi", L".mov", L".mkv", L".wmv"};
 const std::set<std::wstring> document_exts = {L".pdf", L".doc", L".docx", L".xls", L".xlsx", L".ppt", L".pptx", L".txt"};
 
 // Determinar tipo de archivo
 std::wstring get_file_category(const std::wstring& extension) {
     std::wstring ext = extension;
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::towlower);
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::towlower); // convertir a minúscula
 
     // Verifica que la extensión sea parte de la categoría
     if (image_exts.count(ext)) return L"Fotos";
@@ -143,20 +142,22 @@ void move_files_by_date(const fs::path& source_folder, const fs::path& destinati
     }
 }
 
-int main() {
+int wmain(int argc, wchar_t* argv[]) {
     CoInitialize(NULL);
 
     std::wcout << L"Selecciona la carpeta origen:\n";
     std::wstring source_folder = select_folder();
     if (source_folder.empty()) {
-        std::wcout << L"No se seleccionó carpeta origen.\n";
+        MessageBox(NULL, L"No se seleccionó carpeta origen.", L"Error", MB_OK | MB_ICONERROR);
+        CoUninitialize();
         return 1;
     }
 
     std::wcout << L"Selecciona la carpeta destino:\n";
     std::wstring destination_folder = select_folder();
     if (destination_folder.empty()) {
-        std::wcout << L"No se seleccionó carpeta destino.\n";
+        MessageBox(NULL, L"No se seleccionó carpeta destino.", L"Error", MB_OK | MB_ICONERROR);
+        CoUninitialize();
         return 1;
     }
 
