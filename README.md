@@ -1,10 +1,9 @@
 # Mover archivos por Fecha de Modificación
 
 ## 🇪🇸 Español
-*(Leer versión en inglés más abajo)*
+*(Read English version below)*
 
-Un programa sencillo de C++ que organiza archivos moviéndolos de una carpeta a otra en base a sus fechas de modificación y tipo de archivo. Esta herramienta es ideal para organizar archivos como fotos, videos, o documentos de forma estructurada por su fecha.
-
+Un programa que organiza archivos moviéndolos de una carpeta a otra en base a sus fechas de modificación y tipo de archivo.
 ---
 
 ## Funcionalidades
@@ -70,9 +69,9 @@ Siéntete libre de bifurcar el proyecto y enviar solicitudes de incorporación d
 Zahir-R
 
 ## 🇬🇧 English
-*(See Spanish version above)*
+*(Leer versión en español arriba)*
 
-A simple C++ program that organizes files by moving them from one folder to another based on their modification dates and file type. This tool is ideal for organizing files such as photos, videos, or documents in a structured way by date.
+A program that organizes files by moving them from one folder to another based on their modification dates and file type.
 
 ---
 
