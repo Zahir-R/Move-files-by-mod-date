@@ -48,6 +48,12 @@ Para compilar el código C++, necesitas un compilador compatible con **C++17**.
 g++ -o mover_archivos mover_archivos.cpp
 ```
 
+Nota: El programa utiliza funciones Unicode de Windows, por lo tanto si estás usando MinGW, asegúrate de compilar con el flag `-municode`. Además, asegúrate de usar el estándar `C++17` o superior:
+
+```bash
+g++ -std=c++17 -municode -o mover_archivos mover_archivos.cpp
+```
+
 5. Después de la compilación, puedes ejecutar el ejecutable resultante (mover_archivos.exe) desde tu terminal o Símbolo del sistema.
 
 ## Manejo de errores
@@ -109,6 +115,12 @@ To compile the C++ code, you need a **C++17** compatible compiler.
 
 ```bash
 g++ -o mover_archivos mover_archivos.cpp
+```
+
+Note: This program uses Windows Unicode functions, so if you're using MinGW, make sure to compile with the `-municode` flag. Also, be sure to use the `C++17` standard or higher:
+
+```bash
+g++ -std=c++17 -municode -o mover_archivos mover_archivos.cpp
 ```
 
 5. After compilation, you can run the resulting executable (mover_archivos.exe) from your terminal or command prompt.
